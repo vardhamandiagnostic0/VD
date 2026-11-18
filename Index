@@ -300,8 +300,6 @@ Your Health, Our Priority.
 </footer>
 
 <script>
-
-
 const TESTS = [
 {id:1,name:"CBC (3 PART)",category:"Blood",price:100},
 {id:2,name:"CBC (5 PART)",category:"Blood",price:200},
@@ -401,4 +399,335 @@ const TESTS = [
 {id:95,name:"ANTI DS-DNA ANTIBODY",category:"Other",price:500},
 {id:96,name:"ANC PROFILE",category:"Packages",price:1050}
 ];
+let selectedTests = [];
+let activeCategory = "All";
+const testList = document.getElementById("testList");
+const filters = document.getElementById("filters");
+const search = document.getElementById("search");
+const cartItems = document.getElementById("cartItems");
+const totalElement = document.getElementById("total");
+const categories = [
+  "All",
+  ...new Set(TESTS.map(test => test.category))
+];
+// Format Indian currency
+function money(amount) {
+  return "₹" + amount.toLocaleString("en-IN");
+}
+// Display notification
+function notify(message) {
+  let toast = document.getElementById("toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    toast.style.cssText =
+      "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#123d38;color:white;padding:12px 18px;border-radius:10px;z-index:9999;";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.display = "block";
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => {
+    toast.style.display = "none";
+  }, 2200);
+}
+// Create category filters
+function renderFilters() {
+  filters.innerHTML = "";
+  categories.forEach(category => {
+    const button = document.createElement("button");
+    button.className =
+      "chip" +
+      (activeCategory === category ? " active" : "");
+    button.textContent = category;
+    button.type = "button";
+    button.onclick = () => {
+      activeCategory = category;
+      renderFilters();
+      renderTests();
+    };
 
+    filters.appendChild(button);
+  });
+}
+
+// Display tests
+function renderTests() {
+  const query = search.value.toLowerCase().trim();
+
+  const filtered = TESTS.filter(test => {
+    const matchesCategory =
+      activeCategory === "All" ||
+      test.category === activeCategory;
+
+    const matchesSearch =
+      test.name.toLowerCase().includes(query);
+
+    return matchesCategory && matchesSearch;
+  });
+
+  testList.innerHTML = "";
+
+  if (filtered.length === 0) {
+    testList.innerHTML =
+      '<p>No tests found. Try another search.</p>';
+    return;
+  }
+
+  filtered.forEach(test => {
+    const alreadyAdded =
+      selectedTests.some(item => item.id === test.id);
+
+    const priceText =
+      test.price === null
+        ? test.priceText
+        : money(test.price);
+
+    const card = document.createElement("div");
+
+    card.className = "test";
+
+    const title = document.createElement("h3");
+    title.textContent = test.name;
+
+    const category = document.createElement("small");
+    category.textContent = test.category;
+
+    const price = document.createElement("div");
+    price.className = "price";
+    price.textContent = priceText;
+
+    const addButton = document.createElement("button");
+
+    addButton.className = "add";
+    addButton.type = "button";
+
+    addButton.textContent =
+      alreadyAdded ? "Added ✓" : "Add +";
+
+    addButton.disabled = alreadyAdded;
+
+    addButton.onclick = () => addTest(test.id);
+
+    card.appendChild(title);
+    card.appendChild(category);
+    card.appendChild(document.createElement("br"));
+    card.appendChild(price);
+    card.appendChild(document.createElement("br"));
+    card.appendChild(addButton);
+
+    testList.appendChild(card);
+  });
+}
+
+// Add test to cart
+function addTest(id) {
+  const test = TESTS.find(item => item.id === id);
+
+  if (!test) return;
+
+  if (selectedTests.some(item => item.id === id)) {
+    notify("Test already selected");
+    return;
+  }
+
+  selectedTests.push(test);
+
+  renderTests();
+  renderCart();
+
+  notify("Test added successfully");
+}
+
+// Remove test from cart
+function removeTest(id) {
+  selectedTests =
+    selectedTests.filter(item => item.id !== id);
+
+  renderTests();
+  renderCart();
+}
+
+// Calculate total
+function calculateTotal() {
+  return selectedTests.reduce((sum, test) => {
+    return sum + (test.price || 0);
+  }, 0);
+}
+
+// Render cart
+function renderCart() {
+  cartItems.innerHTML = "";
+
+  if (selectedTests.length === 0) {
+    cartItems.textContent = "No tests selected.";
+  }
+
+  selectedTests.forEach(test => {
+    const row = document.createElement("div");
+
+    row.className = "cart-row";
+
+    const name = document.createElement("span");
+    name.textContent = test.name;
+
+    const right = document.createElement("span");
+
+    const price = document.createElement("strong");
+
+    price.textContent =
+      test.price === null
+        ? test.priceText
+        : money(test.price);
+
+    const remove = document.createElement("button");
+
+    remove.className = "remove";
+    remove.type = "button";
+    remove.textContent = "Remove";
+
+    remove.onclick = () => removeTest(test.id);
+
+    right.appendChild(price);
+    right.appendChild(document.createElement("br"));
+    right.appendChild(remove);
+
+    row.appendChild(name);
+    row.appendChild(right);
+
+    cartItems.appendChild(row);
+  });
+
+  const hasMultipleRates =
+    selectedTests.some(test => test.price === null);
+
+  totalElement.textContent =
+    money(calculateTotal()) +
+    (hasMultipleRates ? " + rates to confirm" : "");
+}
+
+// Clear cart
+document.getElementById("clearCart").onclick = () => {
+  selectedTests = [];
+
+  renderTests();
+  renderCart();
+
+  notify("Cart cleared");
+};
+
+// Search tests
+search.addEventListener("input", renderTests);
+
+// Booking form
+document.getElementById("bookingForm")
+  .addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    if (selectedTests.length === 0) {
+      notify("Please select at least one test");
+      return;
+    }
+
+    const patient =
+      document.getElementById("patient").value.trim();
+
+    const mobile =
+      document.getElementById("mobile").value.trim();
+
+    const address =
+      document.getElementById("address").value.trim();
+
+    const date =
+      document.getElementById("date").value;
+
+    const time =
+      document.getElementById("time").value;
+
+    const notes =
+      document.getElementById("notes").value.trim();
+
+    if (!/^[6-9][0-9]{9}$/.test(mobile)) {
+      notify("Enter a valid 10-digit mobile number");
+      return;
+    }
+
+    const testDetails = selectedTests.map(test => {
+      const price =
+        test.price === null
+          ? test.priceText + " (confirm rate)"
+          : money(test.price);
+
+      return "• " + test.name + " - " + price;
+    }).join("\n");
+
+    const message = `
+*VARDHAMAN DIAGNOSTICS*
+*NEW HOME COLLECTION BOOKING*
+
+*Patient Name:* ${patient}
+
+*Mobile Number:* ${mobile}
+
+*Address:* ${address}
+
+*Collection Date:* ${date}
+
+*Preferred Time:* ${time}
+
+*SELECTED TESTS*
+${testDetails}
+
+*Estimated Total:* ${money(calculateTotal())}
+
+*Additional Notes:* ${notes || "None"}
+
+Please confirm appointment availability and final charges.
+
+Thank you.
+    `;
+
+    const whatsappURL =
+      "https://wa.me/917021653862?text=" +
+      encodeURIComponent(message);
+
+    window.open(whatsappURL, "_blank");
+  });
+
+// Set minimum collection date to today
+const today = new Date();
+
+const localDate = [
+  today.getFullYear(),
+  String(today.getMonth() + 1).padStart(2, "0"),
+  String(today.getDate()).padStart(2, "0")
+].join("-");
+
+document.getElementById("date").min = localDate;
+
+// Current year
+const year = document.getElementById("year");
+
+if (year) {
+  year.textContent = new Date().getFullYear();
+}
+
+// Initialize application
+renderFilters();
+renderTests();
+renderCart();
+
+// Register offline service worker
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .catch(error => {
+        console.log("Service worker registration failed:", error);
+      });
+  });
+}
+
+</script>
+</body>
+</html>
