@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123d38">
+<title>Vardhaman Diagnostics</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+:root {
+  --green:#123d38;
+  --green2:#16765e;
+  --mint:#e8f4ef;
+  --bg:#f5f8f6;
+  --ink:#172b27;
+  --muted:#6b7b75;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Arial,sans-serif;
+}
+.wrap { width:min(1120px,94%); margin:auto; }
+.topbar {
+  background:var(--green);
+  color:white;
+  padding:12px;
+  font-size:13px;
+  text-align:center;
+}
+header {
+  background:white;
+  padding:17px 0;
+  border-bottom:1px solid #ddd;
+}
+.nav {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.brand {
+  color:var(--green);
+  font-size:20px;
+  font-weight:bold;
+}
+.brand small {
+  display:block;
+  font-size:10px;
+  letter-spacing:2px;
+}
+.btn {
+  display:inline-block;
+  border:0;
+  border-radius:10px;
+  padding:12px 17px;
+  font-weight:bold;
+  text-decoration:none;
+  cursor:pointer;
+}
+.primary { background:var(--green2); color:white; }
+.hero {
+  background:linear-gradient(120deg,#123d38,#176b55);
+  color:white;
+  padding:55px 0;
+}
+.hero h1 {
+  font-size:clamp(35px,6vw,55px);
+  margin:12px 0;
+}
+.hero p {
+  line-height:1.7;
+  color:#e0eee8;
+}
+.hero-card {
+  background:white;
+  color:var(--ink);
+  padding:23px;
+  border-radius:18px;
+  margin-top:25px;
+}
+section { padding:40px 0; }
+h2 { color:var(--green); }
+input,select,textarea {
+  width:100%;
+  padding:13px;
+  border:1px solid #dce6e0;
+  border-radius:10px;
+  margin:5px 0 12px;
+  font:inherit;
+}
+.filters {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:15px 0;
+}
+.chip {
+  background:white;
+  border:1px solid #ddd;
+  border-radius:25px;
+  padding:9px 14px;
+  cursor:pointer;
+}
+.chip.active {
+  background:var(--green);
+  color:white;
+}
+.tests {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:13px;
+}
+.test {
+  background:white;
+  padding:16px;
+  border:1px solid #e3ebe7;
+  border-radius:14px;
+}
+.test h3 { font-size:15px; }
+.price { color:var(--green); font-weight:bold; }
+.add {
+  background:var(--green2);
+  color:white;
+  border:0;
+  border-radius:8px;
+  padding:9px 12px;
+  cursor:pointer;
+}
+.panel {
+  background:white;
+  border-radius:15px;
+  padding:20px;
+  margin-bottom:18px;
+}
+.cart-row {
+  display:flex;
+  justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid #eee;
+  gap:10px;
+}
+.total {
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
+  margin-top:15px;
+}
+.notice {
+  background:#fff8e8;
+  padding:12px;
+  border-radius:10px;
+  font-size:12px;
+  margin:15px 0;
+}
+footer {
+  background:#0d302b;
+  color:white;
+  padding:30px 0;
+  text-align:center;
+}
+@media(max-width:700px) {
+  .tests { grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:430px) {
+  .tests { grid-template-columns:1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+📍 Ramdev Complex, Sector 19, Airoli, Navi Mumbai
+<br>📞 7021653862 / 8850843129
+</div>
+
+<header>
+<div class="wrap nav">
+<div class="brand">
+✚ VARDHAMAN
+<small>DIAGNOSTICS</small>
+</div>
+<a href="#tests" class="btn primary">Book Test</a>
+</div>
+</header>
+
+<main>
+<section class="hero">
+<div class="wrap">
+<h1>Your Health,<br>Our Priority.</h1>
+<p>
+Accurate testing results at affordable prices.
+Book your blood tests and request home sample collection.
+</p>
+<a href="#tests" class="btn" style="background:white;color:#123d38">
+Explore Tests →
+</a>
+<div class="hero-card">
+<h3>🧪 Home Sample Collection</h3>
+<p>Convenient blood collection at your preferred address.</p>
+<strong>✓ Easy booking</strong><br>
+<strong>✓ 96 laboratory tests</strong><br>
+<strong>✓ WhatsApp booking</strong><br>
+<strong>✓ WhatsApp reports</strong>
+</div>
+</div>
+</section>
+
+<section id="tests">
+<div class="wrap">
+<h2>Explore Our Tests</h2>
+<p>Search and select your required tests.</p>
+<input id="search" type="search" placeholder="Search blood tests...">
+<div id="filters" class="filters"></div>
+<div id="testList" class="tests"></div>
+</div>
+</section>
+
+<section id="booking">
+<div class="wrap">
+<h2>Book Home Collection</h2>
+<div class="panel">
+<h3>Patient Details</h3>
+<form id="bookingForm">
+<label>Patient Name *</label>
+<input id="patient" required placeholder="Full name">
+
+<label>Mobile Number *</label>
+<input id="mobile" required maxlength="10"
+inputmode="numeric" placeholder="10 digit number">
+
+<label>Home Address *</label>
+<textarea id="address" required placeholder="Full address"></textarea>
+
+<label>Collection Date *</label>
+<input id="date" type="date" required>
+
+<label>Preferred Time *</label>
+<select id="time" required>
+<option value="">Select time</option>
+<option>7 AM - 8 AM</option>
+<option>8 AM - 9 AM</option>
+<option>9 AM - 10 AM</option>
+<option>10 AM - 11 AM</option>
+<option>11 AM - 12 PM</option>
+<option>12 PM - 1 PM</option>
+</select>
+
+<label>Additional Notes</label>
+<textarea id="notes" placeholder="Optional"></textarea>
+
+<div class="notice">
+Booking requests are subject to laboratory confirmation.
+Please confirm final pricing and preparation instructions with our team.
+</div>
+
+<button class="btn primary" type="submit">
+Book Through WhatsApp
+</button>
+</form>
+</div>
+
+<div class="panel">
+<h3>Selected Tests</h3>
+<div id="cartItems">No tests selected.</div>
+<div class="total">
+<span>Total</span>
+<span id="total">₹0</span>
+</div>
+<button class="btn primary" id="clearCart" type="button">
+Clear Cart
+</button>
+</div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+<h2>Contact Us</h2>
+<p>Vardhaman Diagnostics</p>
+<p>Shop No. 2, Ramdev Complex, Sector 19,
+Airoli, Navi Mumbai - 400708</p>
+<p>Phone: 7021653862 / 8850843129</p>
+<p>Email: vdairoli20@gmail.com</p>
+<p>Timing: 7:30 AM to 9:00 PM</p>
+<a class="btn primary"
+href="https://wa.me/917021653862">
+WhatsApp Us
+</a>
+</div>
+</section>
+</main>
+
+<footer>
+VARDHAMAN DIAGNOSTICS<br>
+Your Health, Our Priority.
+</footer>
+
+<script>
