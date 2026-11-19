@@ -1,0 +1,21 @@
+
+{
+  "id": "vardhaman-diagnostics",
+  "name": "Vardhaman Diagnostics",
+  "short_name": "Vardhaman",
+  "description": "Book blood tests and home sample collection",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f8f6",
+  "theme_color": "#123d38",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
